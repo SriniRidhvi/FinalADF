@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfpushparrajtest"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"GitHub_properties_typeProperties_url": {
+			"value": "https://pushparajan.github.io/"
+		},
+		"HttpServer1_properties_typeProperties_url": {
+			"value": "https://pushparajan.github.io"
+		},
+		"ls_rest_api_git_hub_properties_typeProperties_url": {
+			"value": "@{linkedService().Github_URL}"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
