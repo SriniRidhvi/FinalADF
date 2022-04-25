@@ -1,0 +1,102 @@
+{
+	"name": "Json_MetaData_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "metadata.json",
+				"container": "testmetadata"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"properties": {
+					"type": "object",
+					"properties": {
+						"AuthorName": {
+							"type": "string"
+						},
+						"AuthorImage": {
+							"type": "string"
+						},
+						"ImageType": {
+							"type": "string"
+						},
+						"ImageMedia": {
+							"type": "string"
+						},
+						"ImageResolution": {
+							"type": "string"
+						},
+						"FileName": {
+							"type": "string"
+						}
+					}
+				},
+				"created_by": {
+					"type": "object",
+					"properties": {
+						"href": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						}
+					}
+				},
+				"created_on": {
+					"type": "string"
+				},
+				"modified_by": {
+					"type": "object",
+					"properties": {
+						"href": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						}
+					}
+				},
+				"renditions": {
+					"type": "object",
+					"properties": {
+						"downloadOriginal": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"href": {
+										"type": "string"
+									}
+								}
+							}
+						},
+						"metadata": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"href": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

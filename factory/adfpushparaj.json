@@ -1,0 +1,9 @@
+{
+	"name": "adfpushparaj",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f2c50e00-d07e-4470-95a1-56877c5cb148",
+		"tenantId": "6fa6a027-84a9-4739-ac9a-feab7c42f7de"
+	}
+}

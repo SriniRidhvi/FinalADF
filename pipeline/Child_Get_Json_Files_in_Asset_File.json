@@ -1,0 +1,209 @@
+{
+	"name": "Child_Get_Json_Files_in_Asset_File",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_asset_jsob_in_Blob",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_blob_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"Asset_Id": {
+								"value": "@pipeline().parameters.Asset_Id",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat('content/asset/print/',pipeline().parameters.Asset_ID)",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lkp_asset_jsob_in_Blob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lkp_asset_jsob_in_Blob').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Download_Author_Json_Files",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_api_src",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_Asset_ID": {
+											"value": "@concat(item().ID,'-Author')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_blob_json_sink",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().id,'-Author')",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@concat('/content/asset/print/',item().id)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Download_Metadata_Json_Files",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Download_Author_Json_Files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_api_src",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_Asset_ID": {
+											"value": "@concat(item().ID,'-Metadata')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_blob_json_sink",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().id,'-Metadata')",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@concat('/content/asset/print/',item().id)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"Asset_Id": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-25T01:05:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

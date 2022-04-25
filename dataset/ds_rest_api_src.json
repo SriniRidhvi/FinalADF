@@ -1,0 +1,24 @@
+{
+	"name": "ds_rest_api_src",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "GitHub",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_Asset_ID": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat(dataset().P_Asset_ID,'.json')",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

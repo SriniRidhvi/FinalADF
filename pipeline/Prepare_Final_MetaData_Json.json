@@ -1,0 +1,148 @@
+{
+	"name": "Prepare_Final_MetaData_Json",
+	"properties": {
+		"activities": [
+			{
+				"name": "Prepare_MetaDataJson",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@concat('content/asset/print/',pipeline().parameters.Asset_Id)",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings",
+							"copyBehavior": "MergeFiles"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['id']"
+								},
+								"sink": {
+									"path": "$['id']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['AuthorName']"
+								},
+								"sink": {
+									"path": "$['properties']['AuthorName']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['AuthorImage']"
+								},
+								"sink": {
+									"path": "$['properties']['AuthorImage']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['ImageType']"
+								},
+								"sink": {
+									"path": "$['properties']['ImageType']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['ImageMedia']"
+								},
+								"sink": {
+									"path": "$['properties']['ImageMedia']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['ImageResolution']"
+								},
+								"sink": {
+									"path": "$['properties']['ImageResolution']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['properties']['FileName']"
+								},
+								"sink": {
+									"path": "$['properties']['FileName']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['renditions']['downloadOriginal'][0]['href']"
+								},
+								"sink": {
+									"path": "$['renditions']['downloadOriginal']"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ReadJsonFiles",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_final_metadata_json_sink",
+						"type": "DatasetReference",
+						"parameters": {
+							"Asset_Id": {
+								"value": "@pipeline().parameters.Asset_Id",
+								"type": "Expression"
+							},
+							"File_Name": {
+								"value": "metadata",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"Asset_Id": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-24T17:46:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

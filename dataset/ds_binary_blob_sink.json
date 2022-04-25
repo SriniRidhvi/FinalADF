@@ -1,0 +1,34 @@
+{
+	"name": "ds_binary_blob_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"File_Name_1": {
+				"type": "string"
+			},
+			"Asset_ID": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().File_Name_1",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('/content/asset/print/',dataset().Asset_ID)",
+					"type": "Expression"
+				},
+				"container": "devpocconyt"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

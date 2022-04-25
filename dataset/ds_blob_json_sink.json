@@ -1,0 +1,102 @@
+{
+	"name": "ds_blob_json_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"File_Name": {
+				"type": "string"
+			},
+			"Folder_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat(dataset().File_Name,'.json')",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().Folder_Name",
+					"type": "Expression"
+				},
+				"container": "devpocconyt"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"properties": {
+					"type": "object",
+					"properties": {
+						"FileName": {
+							"type": "string"
+						}
+					}
+				},
+				"created_by": {
+					"type": "object",
+					"properties": {
+						"href": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						}
+					}
+				},
+				"created_on": {
+					"type": "string"
+				},
+				"modified_by": {
+					"type": "object",
+					"properties": {
+						"href": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						}
+					}
+				},
+				"renditions": {
+					"type": "object",
+					"properties": {
+						"downloadOriginal": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"href": {
+										"type": "string"
+									}
+								}
+							}
+						},
+						"metadata": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"href": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

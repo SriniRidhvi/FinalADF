@@ -1,0 +1,24 @@
+{
+	"name": "ds_get_json_rest_api_src",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_git_hub",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Github_URL": {
+					"value": "@dataset().GitHub_URL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"GitHub_URL": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

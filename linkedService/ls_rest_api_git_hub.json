@@ -1,0 +1,19 @@
+{
+	"name": "ls_rest_api_git_hub",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"Github_URL": {
+				"type": "String",
+				"defaultValue": "https://pushparajan.github.io/69892111-Author.json"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().Github_URL}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
