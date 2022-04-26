@@ -5,12 +5,20 @@
 			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Folder_Path": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "tmp",
+				"folderPath": {
+					"value": "@dataset().Folder_Path",
+					"type": "Expression"
+				},
 				"container": "devpocconyt"
 			}
 		},
