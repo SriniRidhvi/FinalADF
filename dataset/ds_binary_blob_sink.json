@@ -26,7 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat('/content/asset/print/',dataset().Asset_ID)",
+					"value": "@dataset().Folder_Name",
 					"type": "Expression"
 				},
 				"container": "devpocconyt"

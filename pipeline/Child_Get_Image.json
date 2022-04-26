@@ -118,6 +118,10 @@
 										"Asset_ID": {
 											"value": "@pipeline().parameters.Asset_ID",
 											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@concat('/content/asset/',activity('Read_MetaData_From_blob').output.value[0].properties.ImageMedia,'/',pipeline().parameters.Asset_ID)",
+											"type": "Expression"
 										}
 									}
 								}
