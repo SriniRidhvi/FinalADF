@@ -11,6 +11,9 @@
 			},
 			"Asset_ID": {
 				"type": "string"
+			},
+			"Folder_Name": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
