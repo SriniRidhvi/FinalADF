@@ -245,17 +245,19 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "ReadJsonFiles",
-									"type": "DatasetReference"
+									"referenceName": "ds_delete_files_in_tmp",
+									"type": "DatasetReference",
+									"parameters": {
+										"Folder_Path": {
+											"value": "@concat('/tmp/',pipeline().parameters.Asset_ID)",
+											"type": "Expression"
+										}
+									}
 								},
 								"enableLogging": false,
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFileName": {
-										"value": "@{concat('/tmp/',pipeline().parameters.Asset_ID,'/*.json')}",
-										"type": "Expression"
-									},
 									"enablePartitionDiscovery": false
 								}
 							}
