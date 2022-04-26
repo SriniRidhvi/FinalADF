@@ -1,0 +1,65 @@
+{
+	"name": "write_json_files_to_meida_folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Folder_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": {
+					"value": "@dataset().Folder_Name",
+					"type": "Expression"
+				},
+				"container": "devpocconyt"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"properties": {
+					"type": "object",
+					"properties": {
+						"ImageType": {
+							"type": "string"
+						},
+						"ImageMedia": {
+							"type": "string"
+						},
+						"ImageResolution": {
+							"type": "string"
+						},
+						"FileName": {
+							"type": "string"
+						},
+						"AuthorName": {
+							"type": "string"
+						},
+						"AuthorImage": {
+							"type": "string"
+						}
+					}
+				},
+				"renditions": {
+					"type": "object",
+					"properties": {
+						"downloadOriginal": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
