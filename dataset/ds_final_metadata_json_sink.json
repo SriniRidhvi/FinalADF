@@ -11,6 +11,9 @@
 			},
 			"File_Name": {
 				"type": "string"
+			},
+			"Folder_Name": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -23,7 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat('content/asset/metadata/',dataset().Asset_Id)",
+					"value": "@dataset().Folder_Name",
 					"type": "Expression"
 				},
 				"container": "devpocconyt"
