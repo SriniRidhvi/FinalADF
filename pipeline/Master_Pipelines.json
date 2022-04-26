@@ -112,7 +112,7 @@
 							]
 						},
 						{
-							"name": "Call_Get_Image_pipeline",
+							"name": "Download_Image",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
