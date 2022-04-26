@@ -116,7 +116,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Copy_json_To_blob",
+									"activity": "Get_Asset_JSON_Files",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -142,7 +142,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Call_Get_Image_pipeline",
+									"activity": "Copy_json_To_blob",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -168,7 +168,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Get_Asset_JSON_Files",
+									"activity": "Call_Get_Image_pipeline",
 									"dependencyConditions": [
 										"Succeeded"
 									]
