@@ -48,7 +48,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "lkp_metadata_in_Blob",
+						"activity": "lkp_asset_jsob_in_Blob",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -194,54 +194,6 @@
 							]
 						}
 					]
-				}
-			},
-			{
-				"name": "lkp_metadata_in_Blob",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "lkp_asset_jsob_in_Blob",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
-					},
-					"dataset": {
-						"referenceName": "ds_blob_json",
-						"type": "DatasetReference",
-						"parameters": {
-							"Asset_Id": {
-								"value": "@pipeline().parameters.Asset_Id",
-								"type": "Expression"
-							},
-							"Folder_Name": {
-								"value": "@concat('/tmp/',pipeline().parameters.Asset_ID)",
-								"type": "Expression"
-							}
-						}
-					},
-					"firstRowOnly": false
 				}
 			}
 		],
