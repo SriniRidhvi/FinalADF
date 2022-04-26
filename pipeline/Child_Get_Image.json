@@ -128,7 +128,7 @@
 							]
 						},
 						{
-							"name": "Copy data1",
+							"name": "Move_Files_to_Media_Folder",
 							"type": "Copy",
 							"dependsOn": [
 								{
