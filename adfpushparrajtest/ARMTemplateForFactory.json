@@ -68,7 +68,7 @@
 										"type": "Expression"
 									},
 									"Folder_Name": {
-										"value": "@concat('content/asset/print/',pipeline().parameters.Asset_ID)",
+										"value": "@concat('tmp/',pipeline().parameters.Asset_ID)",
 										"type": "Expression"
 									}
 								}
@@ -81,7 +81,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Read_Json_From_blob",
+								"activity": "Read_MetaData_From_blob",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -150,12 +150,201 @@
 												"Asset_ID": {
 													"value": "@pipeline().parameters.Asset_ID",
 													"type": "Expression"
+												},
+												"Folder_Name": {
+													"value": "@concat('/content/asset/',activity('Read_MetaData_From_blob').output.value[0].properties.ImageMedia,'/',pipeline().parameters.Asset_ID)",
+													"type": "Expression"
 												}
 											}
 										}
 									]
+								},
+								{
+									"name": "Move_Files_to_Media_Folder",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Download_Image_to_Blob",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "JsonSource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"wildcardFolderPath": {
+													"value": "@concat('/tmp/',pipeline().parameters.Asset_ID)",
+													"type": "Expression"
+												},
+												"wildcardFileName": "*.json",
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "JsonReadSettings"
+											}
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ReadJsonFiles",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "write_json_files_to_meida_folder",
+											"type": "DatasetReference",
+											"parameters": {
+												"Folder_Name": {
+													"value": "@concat('/content/asset/',activity('Read_MetaData_From_blob').output.value[0].properties.ImageMedia,'/',pipeline().parameters.Asset_ID)",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Prepare_Final_MetaData",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Move_Files_to_Media_Folder",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Prepare_Final_MetaData_Json",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Asset_Id": {
+												"value": "@pipeline().parameters.Asset_ID",
+												"type": "Expression"
+											},
+											"Folder_Name": {
+												"value": "@concat('/content/asset/',activity('Read_MetaData_From_blob').output.value[0].properties.ImageMedia,'/',pipeline().parameters.Asset_ID)",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Delete_Files_In_Tmp",
+									"type": "Delete",
+									"dependsOn": [
+										{
+											"activity": "Prepare_Final_MetaData",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "ds_delete_files_in_tmp",
+											"type": "DatasetReference",
+											"parameters": {
+												"Folder_Path": {
+													"value": "@concat('/tmp/',pipeline().parameters.Asset_ID)",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobStorageReadSettings",
+											"recursive": true,
+											"enablePartitionDiscovery": false
+										}
+									}
 								}
 							]
+						}
+					},
+					{
+						"name": "Read_MetaData_From_blob",
+						"description": "This is from Feature Branch",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Read_Json_From_blob",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "ds_blob_json",
+								"type": "DatasetReference",
+								"parameters": {
+									"Asset_Id": {
+										"value": "@concat(pipeline().parameters.Asset_ID,'-Metadata')",
+										"type": "Expression"
+									},
+									"Folder_Name": {
+										"value": "@concat('tmp/',pipeline().parameters.Asset_ID)",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
 						}
 					}
 				],
@@ -174,7 +363,11 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_blob_json')]",
 				"[concat(variables('factoryId'), '/datasets/ds_binary_http_src')]",
-				"[concat(variables('factoryId'), '/datasets/ds_binary_blob_sink')]"
+				"[concat(variables('factoryId'), '/datasets/ds_binary_blob_sink')]",
+				"[concat(variables('factoryId'), '/datasets/ReadJsonFiles')]",
+				"[concat(variables('factoryId'), '/datasets/write_json_files_to_meida_folder')]",
+				"[concat(variables('factoryId'), '/pipelines/Prepare_Final_MetaData_Json')]",
+				"[concat(variables('factoryId'), '/datasets/ds_delete_files_in_tmp')]"
 			]
 		},
 		{
@@ -216,7 +409,7 @@
 										"type": "Expression"
 									},
 									"Folder_Name": {
-										"value": "@concat('content/asset/print/',pipeline().parameters.Asset_ID)",
+										"value": "@concat('/tmp/',pipeline().parameters.Asset_ID)",
 										"type": "Expression"
 									}
 								}
@@ -298,7 +491,7 @@
 													"type": "Expression"
 												},
 												"Folder_Name": {
-													"value": "@concat('/content/asset/print/',item().id)",
+													"value": "@concat('/tmp/',item().id)",
 													"type": "Expression"
 												}
 											}
@@ -367,7 +560,7 @@
 													"type": "Expression"
 												},
 												"Folder_Name": {
-													"value": "@concat('/content/asset/print/',item().id)",
+													"value": "@concat('/tmp/',item().id)",
 													"type": "Expression"
 												}
 											}
@@ -505,7 +698,7 @@
 													"type": "Expression"
 												},
 												"Folder_Name": {
-													"value": "@concat('content/asset/print/',item().id)",
+													"value": "@concat('tmp/',item().id)",
 													"type": "Expression"
 												}
 											}
@@ -513,11 +706,11 @@
 									]
 								},
 								{
-									"name": "Call_Get_Image_pipeline",
+									"name": "Download_Image",
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "Copy_json_To_blob",
+											"activity": "Get_Asset_JSON_Files",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -543,7 +736,7 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "Call_Get_Image_pipeline",
+											"activity": "Copy_json_To_blob",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -553,32 +746,6 @@
 									"typeProperties": {
 										"pipeline": {
 											"referenceName": "Child_Get_Json_Files_in_Asset_File",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"Asset_Id": {
-												"value": "@item().ID",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "Prepare_Final_MetaData_Json",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "Get_Asset_JSON_Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Prepare_Final_MetaData_Json",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -606,8 +773,7 @@
 				"[concat(variables('factoryId'), '/datasets/ds_rest_api_src')]",
 				"[concat(variables('factoryId'), '/datasets/ds_blob_json_sink')]",
 				"[concat(variables('factoryId'), '/pipelines/Child_Get_Image')]",
-				"[concat(variables('factoryId'), '/pipelines/Child_Get_Json_Files_in_Asset_File')]",
-				"[concat(variables('factoryId'), '/pipelines/Prepare_Final_MetaData_Json')]"
+				"[concat(variables('factoryId'), '/pipelines/Child_Get_Json_Files_in_Asset_File')]"
 			]
 		},
 		{
@@ -635,7 +801,7 @@
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": {
-										"value": "@concat('content/asset/print/',pipeline().parameters.Asset_Id)",
+										"value": "@pipeline().parameters.Folder_Name",
 										"type": "Expression"
 									},
 									"wildcardFileName": "*.json",
@@ -745,6 +911,10 @@
 									"File_Name": {
 										"value": "metadata",
 										"type": "Expression"
+									},
+									"Folder_Name": {
+										"value": "@concat('content/asset/metadata/',pipeline().parameters.Asset_Id)",
+										"type": "Expression"
 									}
 								}
 							}
@@ -757,6 +927,9 @@
 				},
 				"parameters": {
 					"Asset_Id": {
+						"type": "string"
+					},
+					"Folder_Name": {
 						"type": "string"
 					}
 				},
@@ -1028,6 +1201,9 @@
 					},
 					"Asset_ID": {
 						"type": "string"
+					},
+					"Folder_Name": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -1040,7 +1216,7 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@concat('/content/asset/print/',dataset().Asset_ID)",
+							"value": "@dataset().Folder_Name",
 							"type": "Expression"
 						},
 						"container": "devpocconyt"
@@ -1227,6 +1403,120 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_delete_files_in_tmp')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Folder_Path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().Folder_Path",
+							"type": "Expression"
+						},
+						"container": "devpocconyt"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"properties": {
+							"type": "object",
+							"properties": {
+								"AuthorName": {
+									"type": "string"
+								},
+								"AuthorImage": {
+									"type": "string"
+								},
+								"ImageType": {
+									"type": "string"
+								},
+								"ImageMedia": {
+									"type": "string"
+								},
+								"ImageResolution": {
+									"type": "string"
+								},
+								"FileName": {
+									"type": "string"
+								}
+							}
+						},
+						"created_by": {
+							"type": "object",
+							"properties": {
+								"href": {
+									"type": "string"
+								},
+								"title": {
+									"type": "string"
+								}
+							}
+						},
+						"created_on": {
+							"type": "string"
+						},
+						"modified_by": {
+							"type": "object",
+							"properties": {
+								"href": {
+									"type": "string"
+								},
+								"title": {
+									"type": "string"
+								}
+							}
+						},
+						"renditions": {
+							"type": "object",
+							"properties": {
+								"downloadOriginal": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"href": {
+												"type": "string"
+											}
+										}
+									}
+								},
+								"metadata": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"href": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_final_metadata_json_sink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1241,6 +1531,9 @@
 					},
 					"File_Name": {
 						"type": "string"
+					},
+					"Folder_Name": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -1253,7 +1546,7 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@concat('content/asset/metadata/',dataset().Asset_Id)",
+							"value": "@dataset().Folder_Name",
 							"type": "Expression"
 						},
 						"container": "devpocconyt"
@@ -1402,6 +1695,76 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/GitHub')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/write_json_files_to_meida_folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Folder_Name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().Folder_Name",
+							"type": "Expression"
+						},
+						"container": "devpocconyt"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"properties": {
+							"type": "object",
+							"properties": {
+								"ImageType": {
+									"type": "string"
+								},
+								"ImageMedia": {
+									"type": "string"
+								},
+								"ImageResolution": {
+									"type": "string"
+								},
+								"FileName": {
+									"type": "string"
+								},
+								"AuthorName": {
+									"type": "string"
+								},
+								"AuthorImage": {
+									"type": "string"
+								}
+							}
+						},
+						"renditions": {
+							"type": "object",
+							"properties": {
+								"downloadOriginal": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
