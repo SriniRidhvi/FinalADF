@@ -21,7 +21,7 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": {
-								"value": "@concat('content/asset/print/',pipeline().parameters.Asset_Id)",
+								"value": "@pipeline().parameters.Folder_Name",
 								"type": "Expression"
 							},
 							"wildcardFileName": "*.json",
@@ -129,6 +129,10 @@
 							},
 							"File_Name": {
 								"value": "metadata",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat('content/asset/metadata/',pipeline().parameters.Asset_Id)",
 								"type": "Expression"
 							}
 						}
