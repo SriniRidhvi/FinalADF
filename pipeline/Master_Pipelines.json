@@ -162,32 +162,6 @@
 									}
 								}
 							}
-						},
-						{
-							"name": "Prepare_Final_MetaData_Json",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "Call_Get_Image_pipeline",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Prepare_Final_MetaData_Json",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Asset_Id": {
-										"value": "@item().ID",
-										"type": "Expression"
-									}
-								}
-							}
 						}
 					]
 				}
