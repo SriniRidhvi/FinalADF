@@ -1,18 +1,12 @@
 {
-	"name": "ds_final_metadata_json_sink",
+	"name": "ds_delete_files_in_tmp",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"Asset_Id": {
-				"type": "string"
-			},
-			"File_Name": {
-				"type": "string"
-			},
-			"Folder_Name": {
+			"Folder_Path": {
 				"type": "string"
 			}
 		},
@@ -21,12 +15,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "@concat(dataset().File_Name,'.json')",
-					"type": "Expression"
-				},
 				"folderPath": {
-					"value": "@dataset().Folder_Name",
+					"value": "@dataset().Folder_Path",
 					"type": "Expression"
 				},
 				"container": "devpocconyt"
@@ -41,6 +31,12 @@
 				"properties": {
 					"type": "object",
 					"properties": {
+						"AuthorName": {
+							"type": "string"
+						},
+						"AuthorImage": {
+							"type": "string"
+						},
 						"ImageType": {
 							"type": "string"
 						},
@@ -48,12 +44,6 @@
 							"type": "string"
 						},
 						"ImageResolution": {
-							"type": "string"
-						},
-						"AuthorName": {
-							"type": "string"
-						},
-						"AuthorImage": {
 							"type": "string"
 						},
 						"FileName": {
@@ -115,6 +105,5 @@
 				}
 			}
 		}
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+	}
 }

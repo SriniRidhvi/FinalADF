@@ -104,7 +104,7 @@
 											"type": "Expression"
 										},
 										"Folder_Name": {
-											"value": "@concat('content/asset/print/',item().id)",
+											"value": "@concat('tmp/',item().id)",
 											"type": "Expression"
 										}
 									}
@@ -112,11 +112,11 @@
 							]
 						},
 						{
-							"name": "Call_Get_Image_pipeline",
+							"name": "Download_Image",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Copy_json_To_blob",
+									"activity": "Get_Asset_JSON_Files",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -142,7 +142,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Call_Get_Image_pipeline",
+									"activity": "Copy_json_To_blob",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -152,32 +152,6 @@
 							"typeProperties": {
 								"pipeline": {
 									"referenceName": "Child_Get_Json_Files_in_Asset_File",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Asset_Id": {
-										"value": "@item().ID",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
-							"name": "Prepare_Final_MetaData_Json",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "Get_Asset_JSON_Files",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Prepare_Final_MetaData_Json",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
