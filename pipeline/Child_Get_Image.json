@@ -193,6 +193,36 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Move_Files_to_Media_Folder",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Prepare_Final_MetaData_Json",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Asset_Id": {
+										"value": "@pipeline().parameters.Asset_ID",
+										"type": "Expression"
+									},
+									"Folder_Name": {
+										"value": "@concat('/content/asset/',activity('Read_MetaData_From_blob').output.value[0].properties.ImageMedia,'/',pipeline().parameters.Asset_ID)",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}

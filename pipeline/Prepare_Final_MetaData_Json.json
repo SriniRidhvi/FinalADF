@@ -139,6 +139,9 @@
 		"parameters": {
 			"Asset_Id": {
 				"type": "string"
+			},
+			"Folder_Name": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
